@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://cgb8hyygka5qc"]
+
+[node name="BattleScene" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="BattleBackground" type="Sprite2D" parent="."]
+
+[node name="Battlefield" type="Node2D" parent="."]
+
+[node name="PlayerPosition" type="Marker2D" parent="Battlefield"]
+
+[node name="PlayerSprite" type="Sprite2D" parent="Battlefield/PlayerPosition"]
+
+[node name="EnemyPosition" type="Node2D" parent="Battlefield"]
+
+[node name="EnemySlot" type="Marker2D" parent="Battlefield/EnemyPosition"]
+
+[node name="BattleUI" type="CanvasLayer" parent="."]
+
+[node name="BattleManager" type="Node" parent="."]
+
+[node name="TurnManager" type="Node" parent="."]
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="PopupPanel" type="PopupPanel" parent="."]

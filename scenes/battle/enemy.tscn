@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://cojcx2xk6fuvk"]
+
+[node name="Enemy" type="Area2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="HPBar" type="TextureProgressBar" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="IntentionIcon" type="Sprite2D" parent="."]
+
+[node name="HPLabel" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="StatusEffects" type="Node2D" parent="."]
+
+[node name="EnemyData" type="ResourcePreloader" parent="."]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]

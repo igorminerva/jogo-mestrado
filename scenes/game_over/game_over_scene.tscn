@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cufa54blvgh4r"]
+
+[node name="GameOverScene" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Panel" type="CenterContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SadMusic" type="AudioStreamPlayer" parent="."]
