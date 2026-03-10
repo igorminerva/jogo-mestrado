@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://cbxmtcsqueuc0"]
+
+[ext_resource type="Script" uid="uid://cvmf1rra5ewo4" path="res://scripts/battle/card_data.gd" id="1_1a1c3"]
+
+[resource]
+script = ExtResource("1_1a1c3")
+card_name = "attack"
+card_type = "function_attack"
+card_description = "atacke por x dano"
+icon_type = "function_attack"
+metadata/_custom_type_script = "uid://cvmf1rra5ewo4"

@@ -1,62 +1,60 @@
 extends Control
 
-@onready var fanfarra_player: AudioStreamPlayer = $FanfarraPlayer
 @onready var cards_container: GridContainer = $CardsContainer
-@onready var card_scene = preload("res://scenes/battle/card.tscn")
-
-var available_cards: Array = []
-var selected_card_index: int = -1
+@onready var fanfarra_player: AudioStreamPlayer = $FanfarraPlayer
+@onready var card_manager: CardManager = $CardManager
 
 func _ready():
 	fanfarra_player.play()
-	setup_reward_cards()
+	show_reward_cards()
 
-func setup_reward_cards():
-	# Gerar 3 cartas aleatórias
-	for i in range(3):
-		var card = card_scene.instantiate()
+func show_reward_cards():
+	# Pegar 3 cartas aleatórias (com chance de raras)
+	var reward_cards = card_manager.get_random_cards(3, true)
+	
+	# Limpar container
+	for child in cards_container.get_children():
+		child.queue_free()
+	
+	# Criar UI para cada carta
+	for i in range(reward_cards.size()):
+		var card = card_manager.create_card_ui(reward_cards[i])
 		cards_container.add_child(card)
 		
-		# Configurar carta
-		card.card_data = generate_random_card()
+		# Conectar sinal de seleção
+		card.card_selected.connect(_on_reward_card_selected.bind(i))
 		
-		# Chance de raridade (30%)
-		if randf() < 0.3:
+		# Se for rara, adicionar efeito especial
+		if reward_cards[i].card_rarity != "common":
 			card.set_rare(true)
-		
-		card.connect("pressed", _on_card_selected.bind(i))
+			
+			# Animação de entrada para cartas raras
+			var tween = create_tween()
+			tween.tween_property(card, "scale", Vector2(1.2, 1.2), 0.2)
+			tween.tween_property(card, "scale", Vector2(1, 1), 0.2)
 
-func generate_random_card() -> Dictionary:
-	var card_types = ["attack", "defense", "special"]
-	var card_powers = [10, 15, 20, 25, 30]
-	
-	return {
-		"type": card_types[randi() % card_types.size()],
-		"power": card_powers[randi() % card_powers.size()],
-		"cost": randi() % 3 + 1
-	}
-
-func _on_card_selected(index: int):
-	if selected_card_index != -1:
-		# Desselecionar carta anterior
-		cards_container.get_child(selected_card_index).deselect()
-	
-	selected_card_index = index
-	var selected_card = cards_container.get_child(index)
-	selected_card.select()
-	
+func _on_reward_card_selected(card_data: CardData, index: int):
 	# Adicionar carta ao deck do jogador
-	add_card_to_deck(selected_card.card_data)
+	add_card_to_deck(card_data)
 	
-	# Retornar ao mapa
+	# Feedback visual
+	show_card_selected_feedback(index)
+	
+	# Aguardar e voltar ao mapa
 	await get_tree().create_timer(1.0).timeout
 	return_to_map()
 
-func add_card_to_deck(card_data: Dictionary):
+func add_card_to_deck(card_data: CardData):
 	var game_state = get_node("/root/GameState")
 	game_state.player_deck.append(card_data)
 
-func return_to_map():
-	var map_scene = preload("res://scenes/map/map_scene.tscn").instantiate()
-	get_tree().root.add_child(map_scene)
-	queue_free()
+func show_card_selected_feedback(index: int):
+	# Desabilitar outras cartas
+	for i in cards_container.get_children():
+		i.disabled = true
+	
+	# Animar carta selecionada
+	var selected_card = cards_container.get_child(index)
+	var tween = create_tween()
+	tween.tween_property(selected_card, "scale", Vector2(1.3, 1.3), 0.2)
+	tween.tween_property(selected_card, "scale", Vector2(0, 0), 0.3).set_delay(0.3)
