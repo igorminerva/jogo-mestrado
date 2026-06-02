@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://enemy_goblin"]
+
+[ext_resource type="Script" uid="uid://enemy_data_script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Goblin"
+enemy_description = "Um goblin travesso"
+max_hp = 30
+base_attack = 6
+base_defense = 2
+attack_chance = 0.7
+defend_chance = 0.2
+buff_chance = 0.1
+buff_attack_increase = 2
+buff_defense_increase = 1
+exp_reward = 10
+gold_reward = 15

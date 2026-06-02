@@ -34,15 +34,15 @@ func add_card_to_pool(card: CardData):
 func get_random_card(rarity: String = "common") -> CardData:
 	match rarity:
 		"common":
-			return common_cards[randi() % common_cards.size()]
+			return _get_random_from_pool(common_cards)
 		"rare":
-			return rare_cards[randi() % rare_cards.size()]
+			return _get_random_from_pool(rare_cards)
 		"epic":
-			return epic_cards[randi() % epic_cards.size()]
+			return _get_random_from_pool(epic_cards)
 		"legendary":
-			return legendary_cards[randi() % legendary_cards.size()]
+			return _get_random_from_pool(legendary_cards)
 		_:
-			return common_cards[randi() % common_cards.size()]
+			return _get_random_from_pool(common_cards)
 
 func get_random_cards(count: int, allow_rare: bool = true) -> Array[CardData]:
 	var result: Array[CardData] = []
@@ -60,9 +60,25 @@ func get_random_cards(count: int, allow_rare: bool = true) -> Array[CardData]:
 			else:  # 10% são lendárias
 				rarity = "legendary"
 		
-		result.append(get_random_card(rarity))
+		var card = get_random_card(rarity)
+		if card:
+			result.append(card)
 	
 	return result
+
+func _get_random_from_pool(pool: Array[CardData]) -> CardData:
+	if pool.is_empty():
+		print("WARNING: Card pool is empty for requested rarity. Falling back to available cards.")
+		var fallback_pool = []
+		fallback_pool += common_cards
+		fallback_pool += rare_cards
+		fallback_pool += epic_cards
+		fallback_pool += legendary_cards
+		if fallback_pool.is_empty():
+			print("ERROR: No cards available in any pool.")
+			return null
+		return fallback_pool[randi() % fallback_pool.size()]
+	return pool[randi() % pool.size()]
 
 # Função para criar uma carta visualmente
 func create_card_ui(card_data: CardData) -> Button:

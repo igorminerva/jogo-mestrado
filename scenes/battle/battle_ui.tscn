@@ -1,3 +1,84 @@
 [gd_scene format=3 uid="uid://c1tr3ptlepkjk"]
 
 [node name="BattleUi" type="CanvasLayer"]
+
+[node name="TopLeft" type="Panel" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BoxContainer" type="BoxContainer" parent="TopLeft"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Playername" type="VBoxContainer" parent="TopLeft/BoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="TopLeft/BoxContainer/Playername"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLeft/BoxContainer/Playername"]
+layout_mode = 2
+
+[node name="HPBarConteiner" type="HBoxContainer" parent="TopLeft/BoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="TopLeft/BoxContainer/HPBarConteiner"]
+layout_mode = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="TopLeft/BoxContainer/HPBarConteiner"]
+layout_mode = 2
+
+[node name="HPLabel" type="Label" parent="TopLeft/BoxContainer/HPBarConteiner"]
+layout_mode = 2
+
+[node name="StatsGrid" type="GridContainer" parent="TopLeft/BoxContainer"]
+layout_mode = 2
+
+[node name="AttackRow" type="HBoxContainer" parent="TopLeft/BoxContainer/StatsGrid"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="TopLeft/BoxContainer/StatsGrid/AttackRow"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLeft/BoxContainer/StatsGrid/AttackRow"]
+layout_mode = 2
+
+[node name="DefenseRow" type="HBoxContainer" parent="TopLeft/BoxContainer/StatsGrid"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="TopLeft/BoxContainer/StatsGrid/DefenseRow"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLeft/BoxContainer/StatsGrid/DefenseRow"]
+layout_mode = 2
+
+[node name="RegenRow" type="HBoxContainer" parent="TopLeft/BoxContainer/StatsGrid"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="TopLeft/BoxContainer/StatsGrid/RegenRow"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLeft/BoxContainer/StatsGrid/RegenRow"]
+layout_mode = 2
+
+[node name="PowerRow" type="HBoxContainer" parent="TopLeft/BoxContainer/StatsGrid"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="TopLeft/BoxContainer/StatsGrid/PowerRow"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLeft/BoxContainer/StatsGrid/PowerRow"]
+layout_mode = 2
+
+[node name="TopRight" type="Panel" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MarginContainer" type="MarginContainer" parent="TopRight"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TurnCounter" type="Label" parent="TopRight/MarginContainer"]
+layout_mode = 2

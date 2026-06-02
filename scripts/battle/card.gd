@@ -1,120 +1,88 @@
 extends Button
+class_name CardUI
 
 # Sinais
-signal card_played(card_data)
-signal card_selected(card_data)
-signal card_deselected(card_data)
+signal card_played(card_ui)
+signal card_selected(card_ui)
+signal card_hovered(card_ui)
 
 # Dados da carta
-@export var card_data: CardData :
+var _card_data: CardData
+var card_data: CardData:
+	get:
+		return _card_data
 	set(value):
-		card_data = value
+		_card_data = value
 		if is_node_ready():
-			update_from_data()
+			update_display()
 
-# Referências aos nós
-@onready var card_background: TextureRect = $CardBackground
-@onready var card_art: TextureRect = $CardArt  # (se tiver arte no futuro)
-@onready var card_type_icon: TextureRect = $CardTypeIcon
+# Nós
 @onready var card_name_label: Label = $CardName
-@onready var card_description: Label = $CardDescription
+@onready var card_desc_label: Label = $CardDescription
 @onready var card_value_label: Label = $CardValue
-@onready var card_cost_panel: Panel = $CardCost
-@onready var energy_icon: TextureRect = $CardCost/EnergyIcon
 @onready var cost_label: Label = $CardCost/CostLabel
-@onready var effect_icons_container: HBoxContainer = $EffectIconsContainer
-@onready var rare_glow: Sprite2D = $RareGlow
-@onready var hover_animation: AnimationPlayer = $HoverAnimation
-@onready var play_animation: AnimationPlayer = $PlayAnimation
-@onready var audio: Node = $Audio
+@onready var card_type_icon: TextureRect = $CardTypeIcon
+@onready var card_background: TextureRect = $CardBackground
 
-# Atlas principal
-@onready var card_atlas = preload("res://assets/cards/sprite_sheet.png")
-
-# Cache de AtlasTextures
-var atlas_cache: Dictionary = {}
+# Estado
+var is_playable: bool = true
+var is_selected: bool = false
 
 func _ready():
-	if card_data:
-		update_from_data()
-	connect_signals()
-
-func connect_signals():
+	update_display()
+	pressed.connect(_on_pressed)
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
-	pressed.connect(_on_pressed)
-	toggled.connect(_on_toggled)
 
-func update_from_data():
+func update_display():
 	if not card_data:
 		return
 	
-	# 1️⃣ ATUALIZAR FRAME (baseado na raridade)
-	var frame_rect = card_data.get_frame_rect()
-	card_background.texture = get_atlas_texture(frame_rect)
-	
-	# 2️⃣ ATUALIZAR ÍCONE PRINCIPAL (baseado no tipo)
-	var icon_rect = card_data.get_icon_rect()
-	card_type_icon.texture = get_atlas_texture(icon_rect)
-	
-	# 4️⃣ ATUALIZAR ÍCONE DE ENERGIA
-	if card_data.show_energy_icon:
-		var energy_rect = card_data.get_energy_icon_rect()
-		energy_icon.texture = get_atlas_texture(energy_rect)
-		energy_icon.show()
-	else:
-		energy_icon.hide()
-	
-	# 6️⃣ ATUALIZAR TEXTOS
 	card_name_label.text = card_data.card_name
-	card_name_label.label_settings.font_color = card_data.type_colors.name
-	
-	card_description.text = card_data.card_description.replace("{value}", str(card_data.card_value))
-	
+	card_desc_label.text = card_data.card_description.replace("{value}", str(card_data.card_value))
 	card_value_label.text = str(card_data.card_value)
-	card_value_label.label_settings.font_color = card_data.type_colors.value
-	
 	cost_label.text = str(card_data.card_cost)
 	
-	# 7️⃣ APLICAR TINT DE FUNDO
-	card_background.modulate = card_data.type_colors.background_tint
+	# Atualizar cor baseada no tipo
+	match card_data.card_type:
+		"attack", "function_attack":
+			card_value_label.add_theme_color_override("font_color", Color(1, 0.5, 0.3))
+		"defend", "defesa", "function_defend":
+			card_value_label.add_theme_color_override("font_color", Color(0.3, 0.6, 1))
+		"skill", "heal":
+			card_value_label.add_theme_color_override("font_color", Color(0.3, 1, 0.3))
+		_:
+			card_value_label.add_theme_color_override("font_color", Color(1, 0.8, 0.3))
 
-# Função que cria e cacheia AtlasTextures
-func get_atlas_texture(region: Rect2) -> AtlasTexture:
-	var cache_key = str(region)
-	
-	if not atlas_cache.has(cache_key):
-		var atlas_tex = AtlasTexture.new()
-		atlas_tex.atlas = card_atlas
-		atlas_tex.region = region
-		atlas_cache[cache_key] = atlas_tex
-	
-	return atlas_cache[cache_key]
-
-
-func _on_mouse_entered():
-	if not disabled:
-		hover_animation.play("hover")
-		audio.get_node("HoverSound").play()
-		z_index = 5
-
-func _on_mouse_exited():
-	if not disabled:
-		hover_animation.play("unhover")
-		z_index = 0
+func set_playable(playable: bool):
+	is_playable = playable
+	disabled = not playable
+	modulate = Color(1, 1, 1, 0.7 if not playable else 1)
 
 func _on_pressed():
-	if not disabled:
-		audio.get_node("ClickSound").play()
-		play_animation.play("play")
-		card_played.emit(card_data)
+	if is_playable:
+		card_played.emit(self)
 
-func _on_toggled(button_pressed: bool):
-	if button_pressed:
-		card_selected.emit(card_data)
-		scale = Vector2(1.15, 1.15)
+func _on_mouse_entered():
+	if is_playable:
+		scale = Vector2(1.1, 1.1)
 		z_index = 10
-	else:
-		card_deselected.emit(card_data)
-		scale = Vector2(1, 1)
-		z_index = 0
+		card_hovered.emit(self)
+
+func _on_mouse_exited():
+	scale = Vector2(1, 1)
+	z_index = 0
+
+func select_card():
+	is_selected = true
+	modulate = Color(1, 1, 0.8)
+
+func deselect_card():
+	is_selected = false
+	modulate = Color(1, 1, 1)
+
+func play_card_animation():
+	var tween = create_tween()
+	tween.tween_property(self, "scale", Vector2(1.2, 1.2), 0.1)
+	tween.tween_property(self, "scale", Vector2(0, 0), 0.2)
+	tween.tween_callback(queue_free)

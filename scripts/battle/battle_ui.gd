@@ -57,11 +57,16 @@ func update_enemy_intentions(enemies: Array):
 		if enemy.has_method("get_intention"):
 			var intention = enemy.get_intention()
 			var icon = enemy.get_node("IntentionIcon")
-			
+			var texture: Texture2D = null
 			match intention:
 				"attack":
-					icon.texture = preload("res://assets/icons/sword.png")
+					if ResourceLoader.exists("res://assets/icons/sword.png"):
+						texture = load("res://assets/icons/sword.png")
 				"defend":
-					icon.texture = preload("res://assets/icons/shield.png")
+					if ResourceLoader.exists("res://assets/icons/shield.png"):
+						texture = load("res://assets/icons/shield.png")
 				"special":
-					icon.texture = preload("res://assets/icons/star.png")
+					if ResourceLoader.exists("res://assets/icons/star.png"):
+						texture = load("res://assets/icons/star.png")
+			if icon:
+				icon.texture = texture

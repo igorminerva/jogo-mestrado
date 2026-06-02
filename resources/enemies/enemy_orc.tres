@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://enemy_orc"]
+
+[ext_resource type="Script" uid="uid://enemy_data_script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Orc"
+enemy_description = "Um orc feroz"
+max_hp = 50
+base_attack = 10
+base_defense = 3
+attack_chance = 0.8
+defend_chance = 0.15
+buff_chance = 0.05
+buff_attack_increase = 3
+buff_defense_increase = 2
+exp_reward = 20
+gold_reward = 25

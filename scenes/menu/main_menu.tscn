@@ -1,0 +1,166 @@
+[gd_scene load_steps=11 format=3 uid="uid://dmolbdssn7qs"]
+
+[ext_resource type="Texture2D" uid="uid://cgi4blku1wmsb" path="res://assets/backgrounds/menu_bg.png" id="1_bg"]
+[ext_resource type="Texture2D" uid="uid://b1712nqulljvo" path="res://assets/particles/dust_particle.png" id="2_particle"]
+[ext_resource type="FontFile" path="res://assets/fonts/menu_font.tres" id="3_font"]
+[ext_resource type="Script" uid="uid://bkhnycoyu8ofo" path="res://scripts/menu/main_menu.gd" id="4_script"]
+
+[sub_resource type="ParticleProcessMaterial" id="5_particle_material"]
+direction = Vector3(0, -1, 0)
+spread = 90.0
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+gravity = Vector3(0, 10, 0)
+scale_min = 0.5
+scale_max = 1.5
+color = Color(0.8, 0.7, 0.6, 0.3)
+
+[sub_resource type="LabelSettings" id="8_title_settings"]
+font = ExtResource("3_font")
+font_size = 64
+font_color = Color(0.9, 0.8, 0.6, 1)
+outline_size = 4
+outline_color = Color(0.1, 0.05, 0.05, 1)
+
+[sub_resource type="StyleBoxFlat" id="6_button_style"]
+bg_color = Color(0.1, 0.1, 0.15, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.5, 0.4, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="7_button_hover"]
+bg_color = Color(0.2, 0.15, 0.2, 0.95)
+border_color = Color(0.8, 0.6, 0.3, 1)
+
+[sub_resource type="LabelSettings" id="10_tip_settings"]
+font = ExtResource("3_font")
+font_size = 18
+font_color = Color(0.8, 0.8, 0.9, 1)
+
+[sub_resource type="LabelSettings" id="11_version_settings"]
+font = ExtResource("3_font")
+font_size = 12
+font_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_script")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_bg")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Particles" type="GPUParticles2D" parent="."]
+position = Vector2(640, 360)
+amount = 50
+texture = ExtResource("2_particle")
+lifetime = 5.0
+explosiveness = 0.5
+process_material = SubResource("5_particle_material")
+
+[node name="TitleContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.2
+anchor_right = 0.5
+anchor_bottom = 0.2
+offset_left = -126.0
+offset_top = -32.000008
+offset_right = 186.0
+offset_bottom = 32.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="TitleContainer"]
+layout_mode = 2
+text = "RELIC WARS"
+label_settings = SubResource("8_title_settings")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ButtonContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 500.0
+offset_top = 400.0
+offset_right = 700.0
+offset_bottom = 600.0
+alignment = 1
+
+[node name="PlayButton" type="Button" parent="ButtonContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("6_button_style")
+theme_override_styles/hover = SubResource("7_button_hover")
+text = "JOGAR"
+
+[node name="OptionsButton" type="Button" parent="ButtonContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("6_button_style")
+theme_override_styles/hover = SubResource("7_button_hover")
+text = "OPÇÕES"
+
+[node name="QuitButton" type="Button" parent="ButtonContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("6_button_style")
+theme_override_styles/hover = SubResource("7_button_hover")
+text = "SAIR"
+
+[node name="TipPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 200.0
+offset_right = 1030.0
+offset_bottom = 280.0
+theme_override_styles/panel = SubResource("6_button_style")
+
+[node name="TipLabel" type="Label" parent="TipPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 860.0
+offset_bottom = 65.0
+text = "Bem-vindo, viajante!"
+label_settings = SubResource("10_tip_settings")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="TipTimer" type="Timer" parent="."]
+wait_time = 5.0
+autostart = true
+
+[node name="VersionLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 700.0
+offset_right = 20.0
+offset_bottom = 700.0
+text = "v1.0.0"
+label_settings = SubResource("11_version_settings")

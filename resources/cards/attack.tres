@@ -8,4 +8,6 @@ card_name = "attack"
 card_type = "function_attack"
 card_description = "atacke por x dano"
 icon_type = "function_attack"
+card_value = 6
+card_cost = 1
 metadata/_custom_type_script = "uid://cvmf1rra5ewo4"

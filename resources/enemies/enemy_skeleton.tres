@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://enemy_skeleton"]
+
+[ext_resource type="Script" uid="uid://enemy_data_script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_name = "Skeleton"
+enemy_description = "Esqueleto reanimado"
+max_hp = 25
+base_attack = 8
+base_defense = 1
+attack_chance = 0.5
+defend_chance = 0.4
+buff_chance = 0.1
+buff_attack_increase = 2
+buff_defense_increase = 2
+exp_reward = 12
+gold_reward = 10

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://cajgnwxe76j85"]
+
+[ext_resource type="Script" uid="uid://cvmf1rra5ewo4" path="res://scripts/battle/card_data.gd" id="1_rkj7d"]
+
+[resource]
+script = ExtResource("1_rkj7d")
+card_name = "Defesa"
+card_type = "defesa"
+card_value = 5
+card_cost = 1
+metadata/_custom_type_script = "uid://cvmf1rra5ewo4"

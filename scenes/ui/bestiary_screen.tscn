@@ -1,0 +1,36 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/bestiary_screen.gd" id=1]
+
+[node name="BestiaryScreen" type="Control"]
+script = ExtResource("1")
+
+[node name="Panel" type="Panel" parent="."]
+
+[node name="EnemyList" type="ItemList" parent="Panel"]
+
+[node name="DetailPanel" type="Panel" parent="Panel"]
+visible = false
+
+[node name="EnemyName" type="Label" parent="Panel/DetailPanel"]
+text = ""
+
+offset_top = 10.0
+
+[node name="EnemySprite" type="TextureRect" parent="Panel/DetailPanel"]
+
+offset_top = 40.0
+
+[node name="StatsLabel" type="Label" parent="Panel/DetailPanel"]
+
+offset_top = 120.0
+
+[node name="DescriptionLabel" type="Label" parent="Panel/DetailPanel"]
+
+offset_top = 140.0
+
+[node name="CloseButton" type="Button" parent="Panel"]
+text = "Fechar"
+
+offset_bottom = 10.0
+offset_right = 10.0
