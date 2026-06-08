@@ -9,6 +9,7 @@ signal shop_closed(result: Dictionary)
 var offers: Array = []
 
 func _ready():
+	print("DEBUG: ShopScreen loaded")
 	leave_button.pressed.connect(_on_leave_pressed)
 	create_offers()
 	update_gold_display()
@@ -52,8 +53,7 @@ func create_offers():
 		title.add_theme_color_override("font_color", Color(1, 0.9, 0.7))
 		var desc = Label.new()
 		desc.text = offer["description"]
-		desc.autowrap = true
-		desc.clip_text = true
+		desc.custom_minimum_size = Vector2(200, 0)
 		desc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		info.add_child(title)
 		info.add_child(desc)
@@ -97,5 +97,4 @@ func _on_buy_pressed(index: int):
 	update_gold_display()
 
 func _on_leave_pressed():
-	emit_signal("shop_closed", {"success": true})
-	queue_free()
+	get_tree().change_scene_to_file("res://scenes/map/map_scene_slay.tscn")

@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://buc3xowsf0b1d"]
+
+[ext_resource type="Script" uid="uid://dr1c2ycu4lj23" path="res://scripts/map/map_controller.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/map/RoomButton.tscn" id="2"]
+
+[node name="MapScene" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1")
+room_button_scene = ExtResource("2")
+
+[node name="RoomsContainer" type="Control" parent="."]
+anchors_preset = 0
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(576, 324)
+
+[node name="RoomButtonRef" type="Button" parent="."]
+layout_mode = 0

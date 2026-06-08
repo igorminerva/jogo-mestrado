@@ -8,6 +8,7 @@ signal rest_completed(result: Dictionary)
 const HEAL_AMOUNT: int = 30
 
 func _ready():
+	print("DEBUG: RestScreen loaded")
 	rest_button.pressed.connect(_on_rest_pressed)
 	skip_button.pressed.connect(_on_skip_pressed)
 	update_display()
@@ -23,9 +24,7 @@ func _on_rest_pressed():
 	var current_hp = game_state.current_run.get("hp", 50)
 	var max_hp = game_state.current_run.get("max_hp", 50)
 	game_state.current_run["hp"] = min(max_hp, current_hp + HEAL_AMOUNT)
-	emit_signal("rest_completed", {"healed": HEAL_AMOUNT})
-	queue_free()
+	get_tree().change_scene_to_file("res://scenes/map/map_scene_slay.tscn")
 
 func _on_skip_pressed():
-	emit_signal("rest_completed", {"healed": 0})
-	queue_free()
+	get_tree().change_scene_to_file("res://scenes/map/map_scene_slay.tscn")

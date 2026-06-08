@@ -66,4 +66,4 @@ func go_to_map():
 	var game_state = get_node_or_null("/root/GameState")
 	if game_state and game_state.has_method("start_new_run"):
 		game_state.start_new_run()
-	get_tree().change_scene_to_file("res://scenes/map/map_scene.tscn")
+	get_tree().change_scene_to_file("res://scenes/map/map_scene_slay.tscn")

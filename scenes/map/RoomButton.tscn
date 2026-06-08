@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://room-button"]
+
+[ext_resource type="Script" path="res://scripts/map/room_button.gd" id="1"]
+
+[node name="RoomButton" type="Button"]
+script = ExtResource("1")
+rect_min_size = Vector2(80, 80)
+
+[node name="Background" type="ColorRect" parent="."]
+color = Color(0.2, 0.2, 0.2, 0.3)
+anchors_preset = 0
+
+[node name="IconTexture" type="TextureRect" parent="."]
+rect_position = Vector2(8, 8)
+rect_min_size = Vector2(64, 64)
+expand = true
+stretch_mode = 2
+
+[node name="TypeLabel" type="Label" parent="."]
+rect_position = Vector2(0, 64)
+rect_min_size = Vector2(80, 16)
+align = 1
+
+[node name="SelectionOutline" type="Panel" parent="."]
+visible = false
+rect_min_size = Vector2(80, 80)

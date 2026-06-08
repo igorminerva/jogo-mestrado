@@ -17,6 +17,7 @@ signal battle_finished(victory: bool, rewards: Dictionary)
 
 var player_defending: bool = false
 var enemy_attacks_this_turn: bool = false
+var game_over_called: bool = false
 
 var current_energy: int = 3
 var max_energy: int = 3
@@ -209,7 +210,8 @@ func _on_all_enemies_defeated():
 		victory(is_boss_battle)
 		return
 	
-	if player_hp <= 0:
+	if player_hp <= 0 and not game_over_called:
+		game_over_called = true
 		game_over()
 	else:
 		current_turn += 1
@@ -219,9 +221,9 @@ func _on_enemy_turn_finished():
 	print("DEBUG: BattleManager: enemy turn finished signal received")
 	if enemy_manager.get_enemies().is_empty():
 		return
-	if player_hp <= 0:
+	if player_hp <= 0 and not game_over_called:
 		game_over()
-	else:
+	elif player_hp > 0:
 		current_turn += 1
 		print("DEBUG: Enemy turn finished. Preparing player turn. player_hp=", player_hp, " enemies=", enemy_manager.get_enemies().size())
 		# Add a small delay before starting player turn for visual clarity
@@ -244,7 +246,8 @@ func _on_enemy_action(action_type: String, value: int, enemy: Enemy):
 			update_energy_display()
 			create_damage_flash()
 			show_damage_to_player(actual_damage)
-			if player_hp <= 0:
+			if player_hp <= 0 and not game_over_called:
+				game_over_called = true
 				game_over()
 		"defend":
 			# Defesa aplicada internamente pelo inimigo
@@ -455,6 +458,7 @@ func _on_rewards_selected():
 	for node in get_tree().root.get_children():
 		if node.name == "MapScene":
 			node.visible = true
+			node.set_skip_room_auto_selection(false)  # Re-enable after battle
 			node.load_progress_from_game_state()
 			print("DEBUG: Made map visible and reloaded nodes")
 			break
@@ -487,7 +491,7 @@ func show_defeat_screen(killed_by: String = "Unknown"):
 		"enemies_killed": game_state.current_run.enemies_defeated.size(),
 		"killed_by": killed_by
 	})
-	add_child(defeat_scene)
+	battle_ui.add_child(defeat_scene)
 
 func save_battle_deck_to_game_state():
 	var game_state = get_node("/root/GameState")

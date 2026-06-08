@@ -75,7 +75,7 @@ func _on_new_run_pressed():
 		game_state.end_run(false)
 	
 	new_run_requested.emit()
-	get_tree().change_scene_to_file("res://scenes/map/map_scene.tscn")
+	get_tree().change_scene_to_file("res://scenes/map/map_scene_slay.tscn")
 
 func _on_menu_pressed():
 	var game_state = get_node_or_null("/root/GameState")

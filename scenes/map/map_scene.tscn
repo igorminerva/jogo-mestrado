@@ -1,13 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://cycvqrtpasm1j"]
-
-[ext_resource type="Script" uid="uid://c0bdu5gwhhobc" path="res://scripts/map/map_manager.gd" id="1_81at0"]
-[ext_resource type="Script" uid="uid://bya47vhadv3oi" path="res://scripts/map/map_generator.gd" id="2_eenby"]
+[gd_scene load_steps=2 format=3 uid="uid://cycvqrtpasm1j"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.5047695, 0.50581735, 0.61625767, 1)
 
 [node name="MapScene" type="Node2D"]
-script = ExtResource("1_81at0")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(576, 324)
@@ -47,4 +43,3 @@ offset_bottom = 648.0
 color = Color(0, 0, 0, 1)
 
 [node name="MapGenerator" type="Node" parent="."]
-script = ExtResource("2_eenby")
