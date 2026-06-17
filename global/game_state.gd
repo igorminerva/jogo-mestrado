@@ -6,6 +6,7 @@ var bestiary: Dictionary = {}  # { "enemy_name": { "defeats": 0, "kills": 0, "fi
 var total_runs: int = 0
 var total_victories: int = 0
 var total_defeats: int = 0
+var has_seen_intro: bool = false
 
 # Dados da run atual
 var 	current_run: Dictionary = {
@@ -35,7 +36,8 @@ func save_game_data():
 		"bestiary": bestiary,
 		"total_runs": total_runs,
 		"total_victories": total_victories,
-		"total_defeats": total_defeats
+		"total_defeats": total_defeats,
+		"has_seen_intro": has_seen_intro
 	}
 	
 	var file = FileAccess.open("user://player_data.save", FileAccess.WRITE)
@@ -55,6 +57,7 @@ func load_game_data():
 	total_runs = save_data.get("total_runs", 0)
 	total_victories = save_data.get("total_victories", 0)
 	total_defeats = save_data.get("total_defeats", 0)
+	has_seen_intro = save_data.get("has_seen_intro", false)
 	
 	data_loaded.emit()
 
@@ -64,8 +67,12 @@ func initialize_default_data():
 	total_runs = 0
 	total_victories = 0
 	total_defeats = 0
+	has_seen_intro = false
 
 func start_new_run():
+	# Clean up any leftover scenes from previous runs
+	cleanup_old_scenes()
+	
 	total_runs += 1
 	var starting_deck = get_starting_deck()
 	current_run = {
@@ -82,10 +89,25 @@ func start_new_run():
 		"events_visited": [],
 		"card_usage": {},
 		"damage_dealt": 0,
-		"total_enemies_killed": 0
+		"total_enemies_killed": 0,
+		"saved_map_state": null,
+		"completed_nodes": [],
+		"accessible_nodes": [],
+		"completed_floors": [],
+		"accessible_floors": []
 	}
-	print("DEBUG start_new_run: initialized deck with ", starting_deck.size(), " cards")
+	print("DEBUG start_new_run: initialized deck with ", starting_deck.size(), " cards, hp=50, cleared map state")
 	save_game_data()
+
+func cleanup_old_scenes():
+	var root = get_tree().root
+	var scenes_to_clean = ["Battle", "Victory", "Defeat", "VictoryRewards", "TreasureScreen", "ShopScreen", "RestScreen"]
+	for child in root.get_children():
+		for scene_name in scenes_to_clean:
+			if child.name.begins_with(scene_name) or child.name == scene_name:
+				child.queue_free()
+				print("DEBUG: Cleaned up leftover scene from GameState: ", child.name)
+				break
 
 func get_starting_deck() -> Array:
 	var deck: Array = []

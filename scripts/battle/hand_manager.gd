@@ -11,12 +11,18 @@ var hand_curve: float = 0.15
 func _ready():
 	deck_manager.hand_updated.connect(_update_hand_layout)
 	deck_manager.card_drawn.connect(_add_card_to_hand)
+	_update_layout_for_screen_size()
 
-	# Ensure the hand area has a usable size so cards are visible and layout works
-	# If the scene set a custom_minimum_size in the editor, respect it; otherwise fall back
-	if custom_minimum_size == Vector2():
-		custom_minimum_size = Vector2(1152, 220)
-	hand_container.custom_minimum_size = Vector2(1152, 220)
+func _update_layout_for_screen_size():
+	if not is_inside_tree():
+		return
+	var screen_size = get_viewport_rect().size
+	var min_width = minf(screen_size.x, 1152)
+	card_spacing = clampf(min_width / 8.0, 100.0, 160.0)
+	
+	if custom_minimum_size == Vector2() or custom_minimum_size.x < 400:
+		custom_minimum_size = Vector2(screen_size.x, 220)
+	hand_container.custom_minimum_size = Vector2(screen_size.x, 220)
 
 func _add_card_to_hand(card_ui: CardUI):
 	await get_tree().process_frame

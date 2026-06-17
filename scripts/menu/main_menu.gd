@@ -33,6 +33,15 @@ func _ready():
 	tip_timer.timeout.connect(_next_tip)
 	
 	update_tip_display()
+	_setup_responsive_layout()
+
+func _setup_responsive_layout():
+	if not is_inside_tree():
+		return
+	var screen_size = get_viewport_rect().size
+	
+	if particles:
+		particles.position = Vector2(screen_size.x * 0.5, screen_size.y * 0.5)
 
 func setup_button_animations():
 	for button in [play_button, options_button, quit_button]:
@@ -75,9 +84,35 @@ func update_tip_display():
 	tween.tween_property(tip_label, "modulate", Color(1, 1, 1, 1), 0.3)
 
 func _on_play_pressed():
+	# Clean up any leftover scenes from previous runs
+	cleanup_old_scenes()
+	
+	var game_state = get_node_or_null("/root/GameState")
+	var skip_cutscene = game_state and game_state.has_seen_intro
+	
 	var tween = create_tween()
 	tween.tween_property(self, "modulate", Color(1, 1, 1, 0), 0.5)
-	tween.tween_callback(func(): get_tree().change_scene_to_file("res://scenes/menu/cutscene.tscn"))
+	if skip_cutscene:
+		tween.tween_callback(func(): start_game_directly())
+	else:
+		tween.tween_callback(func(): get_tree().change_scene_to_file("res://scenes/menu/cutscene.tscn"))
+
+func start_game_directly():
+	var game_state = get_node_or_null("/root/GameState")
+	if game_state and game_state.has_method("start_new_run"):
+		game_state.start_new_run()
+	get_tree().change_scene_to_file("res://scenes/map/map_scene_slay.tscn")
+
+func cleanup_old_scenes():
+	# Remove any leftover battle scenes or other overlays from previous runs
+	var root = get_tree().root
+	var scenes_to_clean = ["Battle", "Victory", "Defeat", "VictoryRewards", "TreasureScreen", "ShopScreen", "RestScreen"]
+	for child in root.get_children():
+		for scene_name in scenes_to_clean:
+			if child.name.begins_with(scene_name) or child.name == scene_name:
+				child.queue_free()
+				print("DEBUG: Cleaned up leftover scene: ", child.name)
+				break
 
 func _on_options_pressed():
 	print("Opções - Será implementado depois")

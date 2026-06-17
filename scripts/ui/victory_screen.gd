@@ -2,6 +2,7 @@ extends Control
 class_name VictoryScreen
 signal rewards_selected
 signal game_completed
+signal return_to_menu_requested
 
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var story_label: RichTextLabel = $VBoxContainer/StoryLabel
@@ -18,6 +19,7 @@ signal game_completed
 var run_stats: Dictionary = {}
 
 func _ready():
+	z_index = 1000
 	share_button.pressed.connect(_on_share_pressed)
 	menu_button.pressed.connect(_on_menu_pressed)
 	play_victory_sequence()
@@ -130,9 +132,29 @@ func _on_share_pressed():
 	share_button.text = original_text
 
 func _on_menu_pressed():
+	print("DEBUG: Victory menu button pressed")
 	var game_state = get_node_or_null("/root/GameState")
 	if game_state:
 		game_state.end_run(true)
 	
-	game_completed.emit()
-	get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn")
+	cleanup_old_scenes()
+	
+	get_tree().call_deferred("change_scene_to_packed", load("res://scenes/menu/main_menu.tscn"))
+	queue_free()
+
+func cleanup_old_scenes():
+	var current_parent = get_parent()
+	while current_parent:
+		var parent_to_free = current_parent
+		current_parent = current_parent.get_parent()
+		if parent_to_free and parent_to_free.name.begins_with("Battle"):
+			parent_to_free.queue_free()
+			break
+	
+	var root = get_tree().root
+	var scenes_to_clean = ["Battle", "Victory", "Defeat", "VictoryRewards"]
+	for child in root.get_children():
+		for scene_name in scenes_to_clean:
+			if child.name.begins_with(scene_name) or child.name == scene_name:
+				child.queue_free()
+				break

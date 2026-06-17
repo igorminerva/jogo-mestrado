@@ -43,8 +43,28 @@ func _ready():
 	enemy_manager.all_enemies_defeated.connect(_on_all_enemies_defeated)
 	enemy_manager.enemy_turn_finished.connect(_on_enemy_turn_finished)
 	end_turn_button.pressed.connect(end_turn)
+	
+	_setup_responsive_layout()
 
-	print("DEBUG: BattleManager ready. enemy_action_processed connected=", enemy_manager.is_connected("enemy_action_processed", Callable(self, "_on_enemy_action")))
+	print("DEBUG: BattleManager ready. EndTurnButton found=", is_instance_valid(end_turn_button), " path=", end_turn_button.get_path())
+
+func _setup_responsive_layout():
+	if not is_inside_tree():
+		return
+	var screen_size = get_viewport_rect().size
+	
+	var player_pos = $Battlefield/PlayerPosition
+	var enemy_pos = $Battlefield/EnemyPosition
+	
+	player_pos.position = Vector2(screen_size.x * 0.2, screen_size.y * 0.4)
+	enemy_pos.position = Vector2(screen_size.x * 0.75, screen_size.y * 0.4)
+	
+	if camera:
+		camera.position = screen_size / 2
+
+func _on_end_turn_pressed():
+	print("DEBUG: End turn button was pressed!")
+	end_turn()
 
 var is_boss_battle: bool = false
 
@@ -171,8 +191,28 @@ func end_turn():
 		return
 	is_player_turn = false
 	end_turn_button.disabled = true
+	end_turn_button.text = "TURNO INIMIGO..."
+	
+	var btn = end_turn_button
+	var tween = create_tween()
+	tween.tween_property(btn, "modulate", Color(0.5, 0.5, 0.5, 1), 0.1)
+	
+	show_turn_message("Turno do Inimigo!")
+	
 	print("DEBUG: BattleManager: end_turn called, starting enemy turn")
 	enemy_manager.execute_enemy_turn()
+
+func show_turn_message(msg: String):
+	var label = Label.new()
+	label.text = msg
+	label.add_theme_color_override("font_color", Color(1, 0.8, 0.3))
+	label.position = Vector2(500, 100)
+	label.z_index = 100
+	add_child(label)
+	
+	var tween = create_tween()
+	tween.tween_property(label, "modulate", Color(1, 1, 1, 0), 1.5)
+	tween.tween_callback(label.queue_free)
 
 func start_player_turn():
 	is_player_turn = true
@@ -193,6 +233,8 @@ func start_player_turn():
 	
 	# Enable end turn button
 	end_turn_button.disabled = false
+	end_turn_button.text = "FIM DO TURNO"
+	end_turn_button.modulate = Color.WHITE
 	
 	update_energy_display()
 
@@ -409,6 +451,7 @@ func victory(is_boss_victory: bool = false):
 	game_state.current_run.gold += current_battle_rewards["gold"]
 	game_state.current_run.enemies_defeated.append_array(battle_enemy_names)
 	game_state.current_run["total_enemies_killed"] = game_state.current_run.get("total_enemies_killed", 0) + battle_enemy_names.size()
+	emit_signal("battle_finished", true, current_battle_rewards)
 	
 	if is_boss_victory:
 		show_final_victory()
@@ -424,6 +467,7 @@ func show_battle_rewards():
 func show_final_victory():
 	var game_state = get_node("/root/GameState")
 	var victory_scene = preload("res://scenes/ui/victory_screen.tscn").instantiate()
+	victory_scene.z_index = 1000
 	battle_ui.add_child(victory_scene)
 	victory_scene.setup({
 		"gold_reward": current_battle_rewards["gold"],
@@ -481,10 +525,12 @@ func game_over():
 		killed_by = battle_enemy_names[0]
 	game_state.end_run(false)
 	show_defeat_screen(killed_by)
+	emit_signal("battle_finished", false, current_battle_rewards)
 
 func show_defeat_screen(killed_by: String = "Unknown"):
 	var game_state = get_node("/root/GameState")
 	var defeat_scene = preload("res://scenes/ui/defeat_screen.tscn").instantiate()
+	defeat_scene.z_index = 1000
 	defeat_scene.setup({
 		"damage_taken": game_state.current_run.damage_taken,
 		"turn_defeated": current_turn,

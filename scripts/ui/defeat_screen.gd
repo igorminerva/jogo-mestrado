@@ -2,6 +2,7 @@ extends Control
 class_name DefeatScreen
 signal new_run_requested
 signal bestiary_requested
+signal return_to_menu_requested
 
 @onready var damage_taken_label: Label = $Panel/VBoxContainer/DamageTaken
 @onready var turn_defeated_label: Label = $Panel/VBoxContainer/TurnDefeated
@@ -16,6 +17,7 @@ var battle_stats: Dictionary = {}
 var killed_by: String = ""
 
 func _ready():
+	z_index = 1000
 	new_run_button.pressed.connect(_on_new_run_pressed)
 	menu_button.pressed.connect(_on_menu_pressed)
 	bestiary_button.pressed.connect(_on_bestiary_pressed)
@@ -70,21 +72,48 @@ func get_random_unlockable_item() -> String:
 	return unlockable_items[randi() % unlockable_items.size()]
 
 func _on_new_run_pressed():
+	print("DEBUG: New run button pressed")
 	var game_state = get_node_or_null("/root/GameState")
 	if game_state:
 		game_state.end_run(false)
+		game_state.start_new_run()
 	
-	new_run_requested.emit()
-	get_tree().change_scene_to_file("res://scenes/map/map_scene_slay.tscn")
+	cleanup_old_scenes()
+	
+	get_tree().call_deferred("change_scene_to_packed", load("res://scenes/map/map_scene_slay.tscn"))
+	queue_free()
+
+func cleanup_old_scenes():
+	var current_parent = get_parent()
+	while current_parent:
+		var parent_to_free = current_parent
+		current_parent = current_parent.get_parent()
+		if parent_to_free and parent_to_free.name.begins_with("Battle"):
+			parent_to_free.queue_free()
+			break
+	
+	# Also clean any other leftover scenes
+	var root = get_tree().root
+	var scenes_to_clean = ["Battle", "Victory", "Defeat", "VictoryRewards"]
+	for child in root.get_children():
+		for scene_name in scenes_to_clean:
+			if child.name.begins_with(scene_name) or child.name == scene_name:
+				child.queue_free()
+				break
 
 func _on_menu_pressed():
+	print("DEBUG: Defeat screen menu button pressed")
 	var game_state = get_node_or_null("/root/GameState")
 	if game_state:
 		game_state.end_run(false)
 	
-	get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn")
+	cleanup_old_scenes()
+	
+	get_tree().call_deferred("change_scene_to_packed", load("res://scenes/menu/main_menu.tscn"))
+	queue_free()
 
 func _on_bestiary_pressed():
 	bestiary_requested.emit()
 	var bestiary_scene = preload("res://scenes/ui/bestiary_screen.tscn").instantiate()
+	bestiary_scene.z_index = 2000
 	add_child(bestiary_scene)

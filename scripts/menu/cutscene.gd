@@ -63,7 +63,25 @@ func finish_cutscene():
 	tween.tween_callback(func(): go_to_map())
 
 func go_to_map():
+	# Clean up any leftover scenes from previous runs before starting new
+	cleanup_old_scenes()
+	
 	var game_state = get_node_or_null("/root/GameState")
-	if game_state and game_state.has_method("start_new_run"):
-		game_state.start_new_run()
+	if game_state:
+		game_state.has_seen_intro = true
+		game_state.save_game_data()
+		if game_state.has_method("start_new_run"):
+			game_state.start_new_run()
+	
 	get_tree().change_scene_to_file("res://scenes/map/map_scene_slay.tscn")
+
+func cleanup_old_scenes():
+	# Remove any leftover battle scenes or other overlays from previous runs
+	var root = get_tree().root
+	var scenes_to_clean = ["Battle", "Victory", "Defeat", "VictoryRewards", "TreasureScreen", "ShopScreen", "RestScreen"]
+	for child in root.get_children():
+		for scene_name in scenes_to_clean:
+			if child.name.begins_with(scene_name) or child.name == scene_name:
+				child.queue_free()
+				print("DEBUG: Cleaned up leftover scene: ", child.name)
+				break

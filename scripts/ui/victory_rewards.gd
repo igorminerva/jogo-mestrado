@@ -13,6 +13,7 @@ var selected_card_index: int = -1
 var battle_stats: Dictionary = {}
 
 func _ready():
+	z_index = 1000
 	if fanfare_player:
 		fanfare_player.play()
 	generate_rewards()

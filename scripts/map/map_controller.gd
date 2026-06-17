@@ -21,7 +21,13 @@ func _ready():
 	line_container = Node2D.new()
 	add_child(line_container)
 	move_child(line_container, 0)
-	generate_new_map()
+	var game_state = get_node_or_null("/root/GameState")
+	var saved_map = game_state.current_run.get("saved_map_state") if game_state else null
+	if saved_map != null:
+		restore_map_state_from_game_state(saved_map)
+	else:
+		generate_new_map()
+		save_map_state_to_game_state()
 	# Handle room completion after returning from shop/rest
 	check_pending_room_completion()
 	print("DEBUG: MapController _ready() completed. current_room_id=", current_room_id)
@@ -44,6 +50,7 @@ func generate_new_map() -> void:
 		update_reachable_from(start_id)
 		rooms[start_id].is_current = true
 		update_room_visuals()
+	save_map_state_to_game_state()
 
 func layout_rooms() -> void:
 	var screen_size = get_viewport_rect().size
@@ -100,6 +107,60 @@ func draw_all_connections() -> void:
 			line_container.add_child(line)
 			line_container.move_child(line, 0)
 
+func save_map_state_to_game_state() -> void:
+	var game_state = get_node_or_null("/root/GameState")
+	if not game_state:
+		return
+	var room_entries: Array = []
+	for id in rooms:
+		var room = rooms[id]
+		room_entries.append({
+			"id": room.id,
+			"room_type": int(room.room_type),
+			"column": room.column,
+			"row": room.row,
+			"connections": room.connections.duplicate(),
+			"is_visited": room.is_visited,
+			"is_current": room.is_current,
+			"is_reachable": room.is_reachable
+		})
+	game_state.current_run["saved_map_state"] = {
+		"rooms": room_entries,
+		"current_room_id": current_room_id,
+		"skip_room_auto_selection": skip_room_auto_selection
+	}
+
+func restore_map_state_from_game_state(map_state: Dictionary) -> void:
+	if map_state == null or not map_state.has("rooms"):
+		generate_new_map()
+		return
+	rooms.clear()
+	room_buttons.clear()
+	for child in rooms_container.get_children():
+		child.queue_free()
+	if line_container and is_instance_valid(line_container):
+		line_container.queue_free()
+	line_container = Node2D.new()
+	add_child(line_container)
+	move_child(line_container, 0)
+
+	for room_data in map_state["rooms"]:
+		var room = RoomData.new()
+		room.id = int(room_data.get("id", -1))
+		room.room_type = int(room_data.get("room_type", RoomData.RoomType.BATTLE))
+		room.column = int(room_data.get("column", 0))
+		room.row = int(room_data.get("row", 0))
+		room.connections = room_data.get("connections", [])
+		room.is_visited = bool(room_data.get("is_visited", false))
+		room.is_current = bool(room_data.get("is_current", false))
+		room.is_reachable = bool(room_data.get("is_reachable", false))
+		rooms[room.id] = room
+
+	current_room_id = int(map_state.get("current_room_id", -1))
+	skip_room_auto_selection = bool(map_state.get("skip_room_auto_selection", false))
+	layout_rooms()
+	update_room_visuals()
+
 func get_room_center(room_id: int) -> Vector2:
 	if not room_buttons.has(room_id):
 		# approximate by column/row if button not placed yet
@@ -140,6 +201,7 @@ func on_room_selected(room_id: int) -> void:
 	rooms[current_room_id].is_reachable = false
 	update_reachable_from(current_room_id)
 	update_room_visuals()
+	save_map_state_to_game_state()
 	print("DEBUG: Transitioning to room ", room_id, " type=", selected_room.room_type)
 	transition_to_room(selected_room)
 
@@ -287,10 +349,11 @@ func _on_battle_finished(victory: bool, rewards: Dictionary, room_id: int) -> vo
 			if not game_state.current_run.has("completed_nodes"):
 				game_state.current_run["completed_nodes"] = []
 			game_state.current_run["completed_nodes"].append({"id": room_id})
-			if rooms[room_id].room_type == RoomData.RoomType.BOSS:
-				get_tree().change_scene_to_file("res://scenes/menu/main_menu.tscn")
+			save_map_state_to_game_state()
+			# Boss victory is handled by the battle manager's final victory screen.
 	else:
-		show_defeat_screen()
+		# Defeat is handled by the battle manager's defeat screen.
+		pass
 
 func mark_node_completed_by_id(room_id: int) -> void:
 	if not rooms.has(room_id):
@@ -323,6 +386,7 @@ func open_shop(room: RoomData) -> void:
 	var game_state = get_node("/root/GameState")
 	game_state.current_run["pending_room_completion"] = room.id
 	skip_room_auto_selection = true  # Don't auto-select rooms when returning
+	save_map_state_to_game_state()
 	print("DEBUG: Changing to shop scene...")
 	get_tree().change_scene_to_file("res://scenes/ui/shop_screen.tscn")
 
@@ -336,6 +400,7 @@ func check_pending_room_completion() -> void:
 		mark_node_completed_by_id(room_id)
 		unlock_next_nodes_by_id(room_id)
 		update_room_visuals()
+		save_map_state_to_game_state()
 		print("DEBUG: Pending room completion finished")
 	else:
 		print("DEBUG: No pending room completion")
@@ -378,6 +443,7 @@ func rest_at_site(room: RoomData) -> void:
 	var game_state = get_node("/root/GameState")
 	game_state.current_run["pending_room_completion"] = room.id
 	skip_room_auto_selection = true  # Don't auto-select rooms when returning
+	save_map_state_to_game_state()
 	get_tree().change_scene_to_file("res://scenes/ui/rest_screen.tscn")
 
 func show_defeat_screen(killed_by: String = "Unknown") -> void:

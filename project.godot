@@ -19,6 +19,13 @@ config/icon="res://icon.svg"
 
 GameState="*res://global/game_state.gd"
 
+[display]
+
+window/size/initial_position_type=2
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/size/centered=true
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
