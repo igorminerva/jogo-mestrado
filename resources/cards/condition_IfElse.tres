@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://cvsxtfcxm81bo"]
+
+[ext_resource type="Script" uid="uid://cvmf1rra5ewo4" path="res://scripts/battle/card_data.gd" id="1_myaxa"]
+
+[resource]
+script = ExtResource("1_myaxa")
+card_name = "If / Else"
+card_type = "condition_ifelse"
+card_description = "If enemy wants to defend: Raise ATK +1, Else: Raise DEF +1"
+card_value = 1
+icon_type = "condition_skill"

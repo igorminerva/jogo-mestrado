@@ -32,7 +32,11 @@ func _ready():
 	quit_button.pressed.connect(_on_quit_pressed)
 	tip_timer.timeout.connect(_next_tip)
 	
+	get_tree().root.size_changed.connect(_on_viewport_size_changed)
 	update_tip_display()
+	_setup_responsive_layout()
+
+func _on_viewport_size_changed():
 	_setup_responsive_layout()
 
 func _setup_responsive_layout():

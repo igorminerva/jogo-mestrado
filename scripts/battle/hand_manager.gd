@@ -18,11 +18,10 @@ func _update_layout_for_screen_size():
 		return
 	var screen_size = get_viewport_rect().size
 	var min_width = minf(screen_size.x, 1152)
-	card_spacing = clampf(min_width / 8.0, 100.0, 160.0)
+	card_spacing = clampf(min_width / 8.0, 100.0, 150.0)
 	
-	if custom_minimum_size == Vector2() or custom_minimum_size.x < 400:
-		custom_minimum_size = Vector2(screen_size.x, 220)
-	hand_container.custom_minimum_size = Vector2(screen_size.x, 220)
+	custom_minimum_size = Vector2(screen_size.x, 180)
+	hand_container.custom_minimum_size = Vector2(screen_size.x, 180)
 
 func _add_card_to_hand(card_ui: CardUI):
 	await get_tree().process_frame

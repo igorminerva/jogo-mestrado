@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://daike071cgdxg"]
+
+[ext_resource type="Script" uid="uid://cvmf1rra5ewo4" path="res://scripts/battle/card_data.gd" id="1_1kwjv"]
+
+[resource]
+script = ExtResource("1_1kwjv")
+card_name = "For"
+card_type = "repetition_for"
+card_description = "Repeat next card 2 times"
+card_value = 2
+icon_type = "repetition_skill"

@@ -30,6 +30,7 @@ func _ready():
 		save_map_state_to_game_state()
 	# Handle room completion after returning from shop/rest
 	check_pending_room_completion()
+	get_tree().root.size_changed.connect(_on_viewport_size_changed)
 	print("DEBUG: MapController _ready() completed. current_room_id=", current_room_id)
 
 func generate_new_map() -> void:
@@ -85,6 +86,10 @@ func layout_rooms() -> void:
 				room_buttons[room.id] = button
 		# draw connections
 	draw_all_connections()
+
+func _on_viewport_size_changed():
+	layout_rooms()
+	update_room_visuals()
 
 func draw_all_connections() -> void:
 	# remove old children lines
@@ -310,6 +315,8 @@ func start_battle(room: RoomData) -> void:
 	if battle_scene.has_method("setup_battle"):
 		battle_scene.setup_battle(typed_enemies, room.room_type == RoomData.RoomType.ELITE, room.room_type == RoomData.RoomType.BOSS)
 	if battle_scene.has_signal("battle_finished"):
+		if battle_scene.is_connected("battle_finished", Callable(self, "_on_battle_finished")):
+			battle_scene.disconnect("battle_finished", Callable(self, "_on_battle_finished"))
 		battle_scene.connect("battle_finished", Callable(self, "_on_battle_finished").bind(room.id))
 
 func get_enemies_for_room(room: RoomData) -> Array:

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://dvnvrj8tdl5xh"]
+
+[ext_resource type="Script" uid="uid://cvmf1rra5ewo4" path="res://scripts/battle/card_data.gd" id="1_pospb"]
+
+[resource]
+script = ExtResource("1_pospb")
+card_name = "Attribute Def Buff"
+card_type = "buff_def"
+card_description = "Buff your attribute DEF"
+card_value = 3
+icon_type = "varavel_buff"

@@ -23,6 +23,10 @@ var current_energy: int = 3
 var max_energy: int = 3
 var player_block: int = 0
 var player_hp: int = 50
+var player_atk_buff: int = 0
+var player_def_buff: int = 0
+var repeat_next_card: int = 0
+var repeat_type: String = ""
 var is_player_turn: bool = true
 var current_turn: int = 1
 var cards_played_this_turn: int = 0
@@ -44,6 +48,7 @@ func _ready():
 	enemy_manager.enemy_turn_finished.connect(_on_enemy_turn_finished)
 	end_turn_button.pressed.connect(end_turn)
 	
+	get_tree().root.size_changed.connect(_on_viewport_size_changed)
 	_setup_responsive_layout()
 
 	print("DEBUG: BattleManager ready. EndTurnButton found=", is_instance_valid(end_turn_button), " path=", end_turn_button.get_path())
@@ -61,6 +66,9 @@ func _setup_responsive_layout():
 	
 	if camera:
 		camera.position = screen_size / 2
+
+func _on_viewport_size_changed():
+	_setup_responsive_layout()
 
 func _on_end_turn_pressed():
 	print("DEBUG: End turn button was pressed!")
@@ -150,6 +158,11 @@ func _on_card_played(card: CardUI):
 
 func try_play_card(card: CardUI):
 	var cost = card.card_data.card_cost
+	var repetitions = 1
+
+	if repeat_next_card > 0:
+		repetitions = repeat_next_card
+		repeat_next_card = 0
 
 	if current_energy < cost:
 		show_not_enough_energy()
@@ -158,12 +171,23 @@ func try_play_card(card: CardUI):
 	var target = get_target_enemy()
 	if not target:
 		return
-		
-	var success = card_effect.apply_card_effect(card.card_data, target)
 
-	if not success:
-		show_not_enough_energy()
+	var card_type = card.card_data.normalize_card_type(card.card_data.card_type) if card.card_data.has_method("normalize_card_type") else card.card_data.card_type
+	
+	if card_type == "repetition_for":
+		card_effect.apply_card_effect(card.card_data, target)
+		current_energy -= cost
+		deck_manager.discard_card(card)
+		card.play_card_animation()
+		await card.tree_exited
+		update_energy_display()
 		return
+
+	for i in range(repetitions):
+		var success = card_effect.apply_card_effect(card.card_data, target)
+		if not success:
+			show_not_enough_energy()
+			return
 
 	current_energy -= cost
 	cards_played_this_turn += 1
@@ -219,6 +243,10 @@ func start_player_turn():
 	current_energy = max_energy
 	cards_played_this_turn = 0
 	player_block = 0
+	player_atk_buff = 0
+	player_def_buff = 0
+	repeat_next_card = 0
+	repeat_type = ""
 	get_node("/root/GameState").current_run["turns_survived"] += 1
 
 	# Discard unplayed cards from previous turn

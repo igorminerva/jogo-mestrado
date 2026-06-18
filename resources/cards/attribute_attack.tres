@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://bo0we1fwm7qrj"]
+
+[ext_resource type="Script" uid="uid://cvmf1rra5ewo4" path="res://scripts/battle/card_data.gd" id="1_autyu"]
+
+[resource]
+script = ExtResource("1_autyu")
+card_name = "Atribute Attack Buff"
+card_type = "buff_atk"
+card_description = "Buff your Attribute ATK"
+card_value = 3
+icon_type = "variavel_buff"

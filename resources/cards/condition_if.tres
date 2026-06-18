@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://gogk6jeqja77"]
+
+[ext_resource type="Script" uid="uid://cvmf1rra5ewo4" path="res://scripts/battle/card_data.gd" id="1_tnx2a"]
+
+[resource]
+script = ExtResource("1_tnx2a")
+card_name = "Condition If"
+card_type = "condition_if"
+card_description = "If enemy want to attack: Buff atk by 1"
+card_value = 1
+icon_type = "condiction_skill"

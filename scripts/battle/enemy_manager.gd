@@ -53,6 +53,8 @@ func execute_next_enemy_action():
 
 	var enemy = enemies[current_enemy_index]
 	current_enemy = enemy
+	if enemy.enemy_action_executed.is_connected(Callable(self, "_on_enemy_action_executed")):
+		enemy.enemy_action_executed.disconnect(Callable(self, "_on_enemy_action_executed"))
 	enemy.enemy_action_executed.connect(Callable(self, "_on_enemy_action_executed"))
 	enemy.execute_intention()
 

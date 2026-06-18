@@ -41,8 +41,11 @@ func save_game_data():
 	}
 	
 	var file = FileAccess.open("user://player_data.save", FileAccess.WRITE)
-	file.store_var(save_data)
-	data_saved.emit()
+	if file:
+		file.store_var(save_data)
+		data_saved.emit()
+	else:
+		print("ERROR: Could not save game data")
 
 func load_game_data():
 	if not FileAccess.file_exists("user://player_data.save"):
@@ -50,6 +53,10 @@ func load_game_data():
 		return
 	
 	var file = FileAccess.open("user://player_data.save", FileAccess.READ)
+	if not file:
+		initialize_default_data()
+		return
+	
 	var save_data = file.get_var()
 	
 	unlocked_items = save_data.get("unlocked_items", [])
